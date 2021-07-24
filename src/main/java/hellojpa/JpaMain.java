@@ -17,12 +17,24 @@ public class JpaMain {
         try {
 
             // 비영속 상태
-            Member member = new Member();
-            member.setId(100L);
-            member.setName("HelloJPA");
+            Member member1 = new Member();
+            member1.setName("A");
+
+            Member member2 = new Member();
+            member2.setName("B");
+
+            Member member3 = new Member();
+            member3.setName("C");
 
             // 영속 상태
-            em.persist(member);
+            System.out.println("======================");
+            em.persist(member1);    // 1, 51 (50번까지 할당받으려고 call next value 2번 호출, 왜냐하면 처음에 -49부터 시작)
+            em.persist(member2);    // MEMORY
+            em.persist(member3);    // MEMORY
+            System.out.println("member.getId() = " + member1.getId());
+            System.out.println("member.getId() = " + member2.getId());
+            System.out.println("member.getId() = " + member3.getId());
+            System.out.println("======================");
 
             tx.commit();
 
