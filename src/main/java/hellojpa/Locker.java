@@ -1,3 +1,4 @@
+/*
 package hellojpa;
 
 import javax.persistence.*;
@@ -13,3 +14,4 @@ public class Locker {
     @OneToOne(mappedBy = "locker")
     private Member member;
 }
+*/

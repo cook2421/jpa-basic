@@ -1,5 +1,7 @@
 package hellojpa;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -101,6 +103,7 @@ public class JpaMain {
             em.persist(team);
 */
 
+ /*
             Member member = new Member();
             member.setUsername("user1");
             member.setCreatedBy("kim");
@@ -120,11 +123,71 @@ public class JpaMain {
 
             Item item = em.find(Item.class, movie.getId());
             System.out.println("findMovie = " + item);
+*/
+
+
+/*
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            em.persist(member1);
+
+            Member member2 = new Member();
+            member2.setUsername("member2");
+            em.persist(member2);
+            
+            em.flush();
+            em.clear();
+
+            Member refMember = em.getReference(Member.class, member1.getId());
+            System.out.println("refMember.getClass() = " + refMember.getClass());
+            refMember.getUsername();
+
+            Member findMember = em.find(Member.class, member1.getId());
+            System.out.println("findMember.getClass() = " + findMember.getClass());
+            // 영속성 컨텍스트에 있으면 프록시로 조회해도(getReference) 실제 엔티티 반환
+            // 준영속 상태에서 프록시로 먼저 조회하면 그 뒤에 find로 조회해도 프록시로 반환
+            // '==' 비교를 true로 만들기 위함
+*/
+
+
+/*
+
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            em.persist(member1);
+
+            em.flush();
+            em.clear();
+
+            Member refMember = em.getReference(Member.class, member1.getId());
+            System.out.println("refMember.getClass() = " + refMember.getClass());
+
+            em.detach(refMember);
+
+            refMember.getUsername();    // LazyInitializationException 터짐
+*/
+
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            em.persist(member1);
+
+            em.flush();
+            em.clear();
+
+            Member refMember = em.getReference(Member.class, member1.getId());
+            System.out.println("refMember.getClass() = " + refMember.getClass());   // Proxy 여부 확인
+            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember)); // false
+            refMember.getUsername();         // 강제 초기화 방법1
+            Hibernate.initialize(refMember); // 강제 초기화 방법2
+            System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember)); // true
+            // 프록시 초기화 여부
+
 
             tx.commit();
 
         } catch (Exception e) {
             tx.rollback();
+            e.printStackTrace();
         } finally {
             em.close();
         }
