@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Team {
+public class Team extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "TEAM_ID")
@@ -13,7 +13,8 @@ public class Team {
 
     private String name;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany//(mappedBy = "team")
+    @JoinColumn(name = "TEAM_ID")   // 이 부분 없으면 join 테이블이 생성됨.
     private List<Member> members = new ArrayList();
 
 

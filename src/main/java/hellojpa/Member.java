@@ -2,6 +2,9 @@ package hellojpa;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static javax.persistence.GenerationType.AUTO;
 
 @Entity
@@ -15,7 +18,7 @@ import static javax.persistence.GenerationType.AUTO;
         table = "my_sequences",
         pkColumnValue = "member_seq", allocationSize = 1
 )*/
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue/*(
@@ -34,11 +37,16 @@ public class Member {
     /*@Column(name = "TEAM_ID")
     private Long teamId;*/
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "TEAM_ID")
-    private Team team;
+    private Team team;*/
 
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberProduct> memberProducts = new ArrayList<>();
 
 
 
@@ -66,7 +74,7 @@ public class Member {
         this.teamId = teamId;
     }*/
 
-    public Team getTeam() {
+    /*public Team getTeam() {
         return team;
     }
 
@@ -77,5 +85,5 @@ public class Member {
     public void changeTeam(Team team) {
         this.team = team;
         team.getMembers().add(this);
-    }
+    }*/
 }

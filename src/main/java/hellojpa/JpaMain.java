@@ -4,7 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -38,8 +38,26 @@ public class JpaMain {
             System.out.println("======================");
 */
 
-            // 저장
 
+
+/*
+            Member findMember = em.find(Member.class, member.getId());
+            List<Member> members = findMember.getTeam().getMembers();
+
+            for (Member m : members) {
+                System.out.println("m.getUsername() = " + m.getUsername());
+            }
+*/
+
+
+/*
+            // member 객체의 외래키 업데이트
+            Team newTeam = em.find(Team.class, 100L);
+            findMember.setTeam(newTeam);
+*/
+
+
+/*
 
             Team team = new Team();
             team.setName("TeamA");
@@ -66,21 +84,42 @@ public class JpaMain {
                 System.out.println("m.getUsername() = " + m.getUsername());
             }
             System.out.println("==============");
-
-/*
-            Member findMember = em.find(Member.class, member.getId());
-            List<Member> members = findMember.getTeam().getMembers();
-
-            for (Member m : members) {
-                System.out.println("m.getUsername() = " + m.getUsername());
-            }
 */
 
 /*
-            // member 객체의 외래키 업데이트
-            Team newTeam = em.find(Team.class, 100L);
-            findMember.setTeam(newTeam);
+            Member member = new Member();
+            member.setUsername("member1");
+
+            em.persist(member);
+
+            Team team = new Team();
+            team.setName("teamA");
+
+            // 아래 코드는 다른 테이블에 업데이트쳐야하는 부분
+            team.getMembers().add(member);
+
+            em.persist(team);
 */
+
+            Member member = new Member();
+            member.setUsername("user1");
+            member.setCreatedBy("kim");
+            member.setCreatedDate(LocalDateTime.now());
+
+            em.persist(member);
+
+            Movie movie = new Movie();
+            movie.setDirector("aaaa");
+            movie.setActor("bbbb");
+            movie.setName("바람과 함께 사라지다");
+            movie.setPrice(10000);
+            em.persist(movie);
+
+            em.flush();
+            em.clear();
+
+            Item item = em.find(Item.class, movie.getId());
+            System.out.println("findMovie = " + item);
 
             tx.commit();
 
