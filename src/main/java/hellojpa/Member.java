@@ -1,38 +1,43 @@
 package hellojpa;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
-@Entity//(name = "Member")
-//@Table(name = "MBR")
+import static javax.persistence.GenerationType.AUTO;
+
+@Entity
+/*@SequenceGenerator(
+        name = "member_seq_generator",
+        sequenceName = "member_seq",
+        allocationSize = 50
+)*/
+/*@TableGenerator(
+        name = "member_seq_generator",
+        table = "my_sequences",
+        pkColumnValue = "member_seq", allocationSize = 1
+)*/
 public class Member {
 
     @Id
+    @GeneratedValue/*(
+            strategy = GenerationType.SEQUENCE,
+            generator = "member_seq_generator"
+    )*/
+    @Column(name = "MEMBER_ID")
     private Long id;
 
-    @Column(name = "name", insertable = true, updatable = true, nullable = false, length = 10,
-            columnDefinition = "varchar(100) default 'EMPTY'")
+    @Column(name = "USERNAME")
     private String username;
 
-    private BigDecimal age;
+    /*@Column(name = "name", nullable = false)
+    private String name;*/
 
-    @Enumerated(EnumType.STRING)
-    private RoleType roleType;
+    /*@Column(name = "TEAM_ID")
+    private Long teamId;*/
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastModifiedDate;
-
-    private LocalDate createdDate2;
-    private LocalDateTime createDateTime2;
-
-    @Lob
-    private String description;
 
 
 
@@ -53,43 +58,24 @@ public class Member {
         this.username = username;
     }
 
-    public Integer getAge() {
-        return age;
+    /*public Long getTeamId() {
+        return teamId;
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
+    }*/
+
+    public Team getTeam() {
+        return team;
     }
 
-    public RoleType getRoleType() {
-        return roleType;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public void setRoleType(RoleType roleType) {
-        this.roleType = roleType;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Date lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void changeTeam(Team team) {
+        this.team = team;
+        team.getMembers().add(this);
     }
 }
