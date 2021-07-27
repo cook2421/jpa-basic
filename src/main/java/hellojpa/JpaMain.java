@@ -7,6 +7,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -257,6 +259,47 @@ public class JpaMain {
             // setter를 빼서 공유 참조를 변경하는 행위 원천 차단
 */
 
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(new Address("homeCity", "street", "10000"));
+
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+            member.getFavoriteFoods().add("피자");
+
+            member.getAddressHistory().add(new AddressEntity("old1", "street", "10000"));
+            member.getAddressHistory().add(new AddressEntity("old2", "street", "10000"));
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            System.out.println("================start================");
+            Member findMember = em.find(Member.class, member.getId());
+
+            /*List<Address> addressHistory = findMember.getAddressHistory();
+            for (Address address : addressHistory) {
+                System.out.println("address.getCity() = " + address.getCity());
+            }
+
+            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+            for (String favoriteFood : favoriteFoods) {
+                System.out.println("favoriteFood = " + favoriteFood);
+            }*/
+
+            // 1. 값 타입 변경시 새 인스턴스 넣어줄 것. ex) homeCity -> newCity
+//            findMember.getHomeAddress().setCity("newCity");   // 이렇게 하면 안 됨.
+            Address a = findMember.getHomeAddress();
+            //findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode()));
+
+            // 2. String 값 타입 컬렉션 변경. ex) 치킨 -> 한식
+            findMember.getFavoriteFoods().remove("치킨");
+            findMember.getFavoriteFoods().add("한식");
+
+            // 3. 값 타입 컬렉션 변경. old1만 지우고 새로 갈아끼워도 쿼리는 해당 member_id 데이터 다 날리고 새로 다 넣음. 따라서, 쓰면 안 됨.
+            findMember.getAddressHistory().remove(new AddressEntity("old1", "street", "10000")); // equals, hashcode 오버라이드가 잘 되어있어야 함!!
+            findMember.getAddressHistory().add(new AddressEntity("newCity1", "street", "10000"));
 
 
 
