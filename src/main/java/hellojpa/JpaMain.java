@@ -126,7 +126,7 @@ public class JpaMain {
 */
 
 
-/*
+/* 프록시1
             Member member1 = new Member();
             member1.setUsername("member1");
             em.persist(member1);
@@ -134,7 +134,7 @@ public class JpaMain {
             Member member2 = new Member();
             member2.setUsername("member2");
             em.persist(member2);
-            
+
             em.flush();
             em.clear();
 
@@ -150,7 +150,7 @@ public class JpaMain {
 */
 
 
-/*
+/* 프록시2
 
             Member member1 = new Member();
             member1.setUsername("member1");
@@ -167,6 +167,8 @@ public class JpaMain {
             refMember.getUsername();    // LazyInitializationException 터짐
 */
 
+
+/* 프록시3
             Member member1 = new Member();
             member1.setUsername("member1");
             em.persist(member1);
@@ -181,6 +183,82 @@ public class JpaMain {
             Hibernate.initialize(refMember); // 강제 초기화 방법2
             System.out.println("isLoaded = " + emf.getPersistenceUnitUtil().isLoaded(refMember)); // true
             // 프록시 초기화 여부
+*/
+
+/* 지연로딩, 즉시로딩
+
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            member1.setTeam(team);
+            em.persist(member1);
+
+            em.flush();
+            em.clear();
+
+            Member m = em.find(Member.class, member1.getId());
+            System.out.println("m.getTeam().getClass() = " + m.getTeam().getClass());
+
+            System.out.println("=================");
+            m.getTeam().getName();
+            System.out.println("=================");
+*/
+
+/* 영속성 전이, 고아 객체
+            Child child2 = new Child();
+            Child child1 = new Child();
+
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
+
+            em.persist(parent);
+
+            em.flush();
+            em.clear();
+
+            Parent p = em.find(Parent.class, parent.getId());
+            p.getChildList().remove(0);
+*/
+
+/* 임베디드 타입
+
+           Member member = new Member();
+            member.setUsername("hello");
+            member.setHomeAddress(new Address("city", "street", "100"));
+            member.setWorkPeriod(new Period());
+
+            em.persist(member);
+*/
+
+
+/* 값 타입과 불변 객체
+
+            Address address = new Address("city", "street", "100");
+
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            member1.setHomeAddress(address);
+            em.persist(member1);
+
+            Address copyAddress = new Address(address.getCity(),
+                    address.getStreet(),
+                    address.getZipcode());
+
+            Member member2 = new Member();
+            member2.setUsername("member2");
+            member2.setHomeAddress(copyAddress);
+            em.persist(member2);
+
+            //member1.getHomeAddress().setCity("new City");
+            // setter를 빼서 공유 참조를 변경하는 행위 원천 차단
+*/
+
+
+
 
 
             tx.commit();
