@@ -6,6 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -259,6 +262,8 @@ public class JpaMain {
             // setter를 빼서 공유 참조를 변경하는 행위 원천 차단
 */
 
+/* 값 타입 컬렉션
+
             Member member = new Member();
             member.setUsername("member1");
             member.setHomeAddress(new Address("homeCity", "street", "10000"));
@@ -278,15 +283,15 @@ public class JpaMain {
             System.out.println("================start================");
             Member findMember = em.find(Member.class, member.getId());
 
-            /*List<Address> addressHistory = findMember.getAddressHistory();
-            for (Address address : addressHistory) {
-                System.out.println("address.getCity() = " + address.getCity());
-            }
-
-            Set<String> favoriteFoods = findMember.getFavoriteFoods();
-            for (String favoriteFood : favoriteFoods) {
-                System.out.println("favoriteFood = " + favoriteFood);
-            }*/
+//            List<Address> addressHistory = findMember.getAddressHistory();
+//            for (Address address : addressHistory) {
+//                System.out.println("address.getCity() = " + address.getCity());
+//            }
+//
+//            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+//            for (String favoriteFood : favoriteFoods) {
+//                System.out.println("favoriteFood = " + favoriteFood);
+//            }
 
             // 1. 값 타입 변경시 새 인스턴스 넣어줄 것. ex) homeCity -> newCity
 //            findMember.getHomeAddress().setCity("newCity");   // 이렇게 하면 안 됨.
@@ -300,8 +305,40 @@ public class JpaMain {
             // 3. 값 타입 컬렉션 변경. old1만 지우고 새로 갈아끼워도 쿼리는 해당 member_id 데이터 다 날리고 새로 다 넣음. 따라서, 쓰면 안 됨.
             findMember.getAddressHistory().remove(new AddressEntity("old1", "street", "10000")); // equals, hashcode 오버라이드가 잘 되어있어야 함!!
             findMember.getAddressHistory().add(new AddressEntity("newCity1", "street", "10000"));
+*/
 
+/* 간단한 JPQL
 
+            List<Member> result = em.createQuery(
+                    "select m from Member m where m.username like '%kim%'",
+                    Member.class
+            ).getResultList();
+
+단점: String으로 SQL을 짜다 보니 디버깅, 동적 쿼리 힘듦
+
+*/
+
+/* 간단한 JPA Criteria
+
+            // Criteria 사용 준비
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Member> query = cb.createQuery(Member.class);
+
+            Root<Member> m = query.from(Member.class);
+
+            CriteriaQuery<Member> cq = query.select(m);
+
+            String username = "asdfasdf";
+            if(username != null){
+                cq = cq.where(cb.equal(m.get("username"), "kim"));
+            }
+
+            List<Member> resultList = em.createQuery(cq).getResultList();
+
+장점: 자바로 쿼리문을 만들기 때문에 디버깅, 동적쿼리 용이
+단점: 사용법이 은근 어려우며 SQL스럽지가 않음
+
+*/
 
 
             tx.commit();
